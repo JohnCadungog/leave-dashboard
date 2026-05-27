@@ -4,7 +4,16 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>leave-dashboard</title>
+    <meta name="description" content="Leave request management system for teams" />
+    <title>LeaveDesk</title>
+    <script>
+      // Prevent theme flash — apply persisted theme before paint
+      ;(function () {
+        var stored = localStorage.getItem('theme')
+        var preferred = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        document.documentElement.classList.add(preferred)
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

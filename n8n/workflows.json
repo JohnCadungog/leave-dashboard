@@ -1,0 +1,266 @@
+{
+  "meta": {
+    "instanceId": "leave-dashboard-n8n"
+  },
+  "nodes": [
+    {
+      "id": "webhook-new",
+      "name": "Webhook - New Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "leave-new",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "if-secret-new",
+      "name": "IF - Valid Secret (New)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "id": "secret-check",
+              "leftValue": "={{ $headers['x-webhook-secret'] }}",
+              "rightValue": "={{ $credentials.webhookSecret }}",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "respond-401-new",
+      "name": "Respond 401 (New)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 460],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"error\": \"Unauthorized\" }",
+        "options": { "responseCode": 401 }
+      }
+    },
+    {
+      "id": "teams-new",
+      "name": "Teams - New Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [680, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $credentials.teamsWebhookUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "Content-Type", "value": "application/json" }]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={\n  \"@type\": \"MessageCard\",\n  \"@context\": \"https://schema.org/extensions\",\n  \"themeColor\": \"F59E0B\",\n  \"summary\": \"New leave request\",\n  \"title\": \"🔔 New Leave Request\",\n  \"sections\": [{\n    \"activityTitle\": \"{{ $json.body.employee_name }} requested leave\",\n    \"facts\": [\n      { \"name\": \"From\", \"value\": \"{{ $json.body.start_date }}\" },\n      { \"name\": \"To\",   \"value\": \"{{ $json.body.end_date }}\" },\n      { \"name\": \"Reason\", \"value\": \"{{ $json.body.reason }}\" }\n    ]\n  }],\n  \"potentialAction\": [{\n    \"@type\": \"OpenUri\",\n    \"name\": \"Open Dashboard\",\n    \"targets\": [{ \"os\": \"default\", \"uri\": \"{{ $env.APP_URL }}/dashboard\" }]\n  }]\n}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "respond-200-new",
+      "name": "Respond 200 (New)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 200],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"ok\": true }",
+        "options": { "responseCode": 200 }
+      }
+    },
+    {
+      "id": "webhook-decision",
+      "name": "Webhook - Decision",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 700],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "leave-decision",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "if-secret-decision",
+      "name": "IF - Valid Secret (Decision)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 700],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "id": "secret-check-2",
+              "leftValue": "={{ $headers['x-webhook-secret'] }}",
+              "rightValue": "={{ $credentials.webhookSecret }}",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "respond-401-decision",
+      "name": "Respond 401 (Decision)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 860],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"error\": \"Unauthorized\" }",
+        "options": { "responseCode": 401 }
+      }
+    },
+    {
+      "id": "switch-status",
+      "name": "Switch - Status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [680, 640],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "approved",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.status }}",
+                    "rightValue": "approved",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "rejected",
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.status }}",
+                    "rightValue": "rejected",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "teams-approved",
+      "name": "Teams - Approved",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [900, 580],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $credentials.teamsWebhookUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "Content-Type", "value": "application/json" }]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={\n  \"@type\": \"MessageCard\",\n  \"@context\": \"https://schema.org/extensions\",\n  \"themeColor\": \"10B981\",\n  \"summary\": \"Leave Approved\",\n  \"title\": \"✅ Leave Approved\",\n  \"sections\": [{\n    \"activityTitle\": \"{{ $json.body.employee_name }}'s leave has been approved\",\n    \"facts\": [\n      { \"name\": \"From\", \"value\": \"{{ $json.body.start_date }}\" },\n      { \"name\": \"To\",   \"value\": \"{{ $json.body.end_date }}\" },\n      { \"name\": \"Approved by\", \"value\": \"{{ $json.body.decided_by }}\" }\n    ]\n  }],\n  \"potentialAction\": [{\n    \"@type\": \"OpenUri\",\n    \"name\": \"Open Dashboard\",\n    \"targets\": [{ \"os\": \"default\", \"uri\": \"{{ $env.APP_URL }}/dashboard\" }]\n  }]\n}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "teams-rejected",
+      "name": "Teams - Rejected",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [900, 700],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $credentials.teamsWebhookUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "Content-Type", "value": "application/json" }]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={\n  \"@type\": \"MessageCard\",\n  \"@context\": \"https://schema.org/extensions\",\n  \"themeColor\": \"F43F5E\",\n  \"summary\": \"Leave Rejected\",\n  \"title\": \"❌ Leave Rejected\",\n  \"sections\": [{\n    \"activityTitle\": \"{{ $json.body.employee_name }}'s leave has been rejected\",\n    \"facts\": [\n      { \"name\": \"From\", \"value\": \"{{ $json.body.start_date }}\" },\n      { \"name\": \"To\",   \"value\": \"{{ $json.body.end_date }}\" },\n      { \"name\": \"Rejected by\", \"value\": \"{{ $json.body.decided_by }}\" }\n    ]\n  }],\n  \"potentialAction\": [{\n    \"@type\": \"OpenUri\",\n    \"name\": \"Open Dashboard\",\n    \"targets\": [{ \"os\": \"default\", \"uri\": \"{{ $env.APP_URL }}/dashboard\" }]\n  }]\n}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "respond-200-decision",
+      "name": "Respond 200 (Decision)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1100, 640],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"ok\": true }",
+        "options": { "responseCode": 200 }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - New Request": {
+      "main": [[{ "node": "IF - Valid Secret (New)", "type": "main", "index": 0 }]]
+    },
+    "IF - Valid Secret (New)": {
+      "main": [
+        [{ "node": "Teams - New Request", "type": "main", "index": 0 }],
+        [{ "node": "Respond 401 (New)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Teams - New Request": {
+      "main": [[{ "node": "Respond 200 (New)", "type": "main", "index": 0 }]]
+    },
+    "Webhook - Decision": {
+      "main": [[{ "node": "IF - Valid Secret (Decision)", "type": "main", "index": 0 }]]
+    },
+    "IF - Valid Secret (Decision)": {
+      "main": [
+        [{ "node": "Switch - Status", "type": "main", "index": 0 }],
+        [{ "node": "Respond 401 (Decision)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Switch - Status": {
+      "main": [
+        [{ "node": "Teams - Approved", "type": "main", "index": 0 }],
+        [{ "node": "Teams - Rejected", "type": "main", "index": 0 }]
+      ]
+    },
+    "Teams - Approved": {
+      "main": [[{ "node": "Respond 200 (Decision)", "type": "main", "index": 0 }]]
+    },
+    "Teams - Rejected": {
+      "main": [[{ "node": "Respond 200 (Decision)", "type": "main", "index": 0 }]]
+    }
+  }
+}
