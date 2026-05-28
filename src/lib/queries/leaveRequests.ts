@@ -1,25 +1,34 @@
 import { supabase } from '@/lib/supabase/client'
-import type { Database, LeaveRequestStatus, LeaveRequestWithEmployee } from '@/lib/supabase/types'
+import type {
+  Database,
+  LeaveRequestStatus,
+  LeaveRequestWithEmployee,
+  LeaveType,
+} from '@/lib/supabase/types'
 
 type InsertRow = Database['public']['Tables']['leave_requests']['Insert']
 type UpdateRow = Database['public']['Tables']['leave_requests']['Update']
 
+const SELECT_WITH_RELATIONS = `
+  *,
+  employee:profiles!leave_requests_employee_id_fkey ( id, full_name, email, role, created_at ),
+  decider:profiles!leave_requests_decided_by_fkey ( id, full_name, email, role, created_at )
+`
+
 export async function fetchLeaveRequests(
-  status?: LeaveRequestStatus | 'all'
+  status?: LeaveRequestStatus | 'all',
+  employeeId?: string
 ): Promise<LeaveRequestWithEmployee[]> {
   let query = supabase
     .from('leave_requests')
-    .select(
-      `
-      *,
-      employee:profiles!leave_requests_employee_id_fkey ( id, full_name, role, created_at ),
-      decider:profiles!leave_requests_decided_by_fkey ( id, full_name, role, created_at )
-    `
-    )
+    .select(SELECT_WITH_RELATIONS)
     .order('created_at', { ascending: false })
 
   if (status && status !== 'all') {
     query = query.eq('status', status)
+  }
+  if (employeeId) {
+    query = query.eq('employee_id', employeeId)
   }
 
   const { data, error } = await query
@@ -30,13 +39,7 @@ export async function fetchLeaveRequests(
 export async function fetchApprovedLeaveRequests(): Promise<LeaveRequestWithEmployee[]> {
   const { data, error } = await supabase
     .from('leave_requests')
-    .select(
-      `
-      *,
-      employee:profiles!leave_requests_employee_id_fkey ( id, full_name, role, created_at ),
-      decider:profiles!leave_requests_decided_by_fkey ( id, full_name, role, created_at )
-    `
-    )
+    .select(SELECT_WITH_RELATIONS)
     .eq('status', 'approved')
     .order('start_date', { ascending: true })
 
@@ -46,12 +49,14 @@ export async function fetchApprovedLeaveRequests(): Promise<LeaveRequestWithEmpl
 
 export async function createLeaveRequest(values: {
   employee_id: string
+  leave_type: LeaveType
   start_date: string
   end_date: string
   reason: string
 }): Promise<{ id: string }> {
   const insertData: InsertRow = {
     employee_id: values.employee_id,
+    leave_type: values.leave_type,
     start_date: values.start_date,
     end_date: values.end_date,
     reason: values.reason,

@@ -8,6 +8,7 @@ import { useApprovedLeaveRequests } from '@/hooks/useLeaveRequests'
 import { employeeCalendarColor, formatDate } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { leaveTypeLabel } from '@/lib/supabase/types'
 import type { LeaveRequestWithEmployee } from '@/lib/supabase/types'
 
 const locales = { 'en-US': enUS }
@@ -41,7 +42,7 @@ function CalendarContent() {
   const events = useMemo<CalendarEvent[]>(() => {
     if (!requests) return []
     return requests.map((r) => ({
-      title: r.employee.full_name,
+      title: `${r.employee.full_name} · ${leaveTypeLabel(r.leave_type)}`,
       start: parseISO(r.start_date),
       end: parseISO(r.end_date),
       allDay: true,
@@ -158,6 +159,9 @@ function EventDetailModal({
         </DialogHeader>
         {event && (
           <div className="space-y-2">
+            <p className="text-xs font-medium uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+              {leaveTypeLabel(event.resource.leave_type)}
+            </p>
             <p className="text-sm text-muted-foreground">
               {formatDate(event.resource.start_date)}
               {event.resource.start_date !== event.resource.end_date &&

@@ -5,14 +5,14 @@ import {
   fetchLeaveRequests,
   updateLeaveRequestStatus,
 } from '@/lib/queries/leaveRequests'
-import type { LeaveRequestStatus, LeaveRequestWithEmployee } from '@/lib/supabase/types'
+import type { LeaveRequestStatus, LeaveRequestWithEmployee, LeaveType } from '@/lib/supabase/types'
 import { notifyDecision, notifyNewRequest } from '@/lib/webhook'
 import type { Profile } from '@/lib/supabase/types'
 
-export function useLeaveRequests(status?: LeaveRequestStatus | 'all') {
+export function useLeaveRequests(status?: LeaveRequestStatus | 'all', employeeId?: string) {
   return useQuery<LeaveRequestWithEmployee[], Error>({
-    queryKey: ['leave_requests', status ?? 'all'],
-    queryFn: () => fetchLeaveRequests(status),
+    queryKey: ['leave_requests', status ?? 'all', employeeId ?? 'all'],
+    queryFn: () => fetchLeaveRequests(status, employeeId),
     staleTime: 30 * 1000,
   })
 }
@@ -25,12 +25,13 @@ export function useApprovedLeaveRequests() {
   })
 }
 
-export function useCreateLeaveRequest(currentUser: Profile | undefined) {
+export function useCreateLeaveRequest(currentUser: Profile | undefined, currentEmail?: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (values: {
       employee_id: string
+      leave_type: LeaveType
       start_date: string
       end_date: string
       reason: string
@@ -40,7 +41,8 @@ export function useCreateLeaveRequest(currentUser: Profile | undefined) {
       if (currentUser) {
         notifyNewRequest({
           employee_name: currentUser.full_name,
-          employee_email: '',
+          employee_email: currentUser.email ?? currentEmail ?? '',
+          leave_type: variables.leave_type,
           start_date: variables.start_date,
           end_date: variables.end_date,
           reason: variables.reason,
@@ -108,6 +110,8 @@ export function useDecideLeaveRequest(currentUser: Profile | undefined) {
       if (cached && currentUser) {
         notifyDecision({
           employee_name: cached.employee.full_name,
+          employee_email: cached.employee.email ?? '',
+          leave_type: cached.leave_type,
           start_date: cached.start_date,
           end_date: cached.end_date,
           decided_by: currentUser.full_name,

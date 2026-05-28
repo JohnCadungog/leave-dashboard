@@ -1,10 +1,12 @@
 import { toast } from 'sonner'
+import type { LeaveType } from '@/lib/supabase/types'
 
 const secret = import.meta.env.VITE_N8N_WEBHOOK_SECRET as string
 
 interface NewRequestPayload {
   employee_name: string
   employee_email: string
+  leave_type: LeaveType
   start_date: string
   end_date: string
   reason: string
@@ -13,6 +15,8 @@ interface NewRequestPayload {
 
 interface DecisionPayload {
   employee_name: string
+  employee_email: string
+  leave_type: LeaveType
   start_date: string
   end_date: string
   decided_by: string

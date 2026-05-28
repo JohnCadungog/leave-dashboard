@@ -1,5 +1,16 @@
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[]
 
+export type LeaveType = 'annual' | 'sick' | 'personal' | 'unpaid' | 'bereavement' | 'other'
+
+export const LEAVE_TYPES: { value: LeaveType; label: string }[] = [
+  { value: 'annual', label: 'Annual Leave' },
+  { value: 'sick', label: 'Sick Leave' },
+  { value: 'personal', label: 'Personal Leave' },
+  { value: 'unpaid', label: 'Unpaid Leave' },
+  { value: 'bereavement', label: 'Bereavement Leave' },
+  { value: 'other', label: 'Other' },
+]
+
 export interface Database {
   public: {
     Tables: {
@@ -7,18 +18,21 @@ export interface Database {
         Row: {
           id: string
           full_name: string
+          email: string | null
           role: 'employee' | 'manager'
           created_at: string
         }
         Insert: {
           id: string
           full_name: string
+          email?: string | null
           role?: 'employee' | 'manager'
           created_at?: string
         }
         Update: {
           id?: string
           full_name?: string
+          email?: string | null
           role?: 'employee' | 'manager'
           created_at?: string
         }
@@ -28,6 +42,7 @@ export interface Database {
         Row: {
           id: string
           employee_id: string
+          leave_type: LeaveType
           start_date: string
           end_date: string
           reason: string
@@ -39,6 +54,7 @@ export interface Database {
         Insert: {
           id?: string
           employee_id: string
+          leave_type: LeaveType
           start_date: string
           end_date: string
           reason: string
@@ -50,6 +66,7 @@ export interface Database {
         Update: {
           id?: string
           employee_id?: string
+          leave_type?: LeaveType
           start_date?: string
           end_date?: string
           reason?: string
@@ -91,4 +108,8 @@ export type LeaveRequestStatus = LeaveRequest['status']
 export type LeaveRequestWithEmployee = LeaveRequest & {
   employee: Profile
   decider: Profile | null
+}
+
+export function leaveTypeLabel(value: LeaveType): string {
+  return LEAVE_TYPES.find((t) => t.value === value)?.label ?? value
 }

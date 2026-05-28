@@ -2,6 +2,9 @@ import { z } from 'zod'
 
 export const leaveRequestSchema = z
   .object({
+    leave_type: z.enum(['annual', 'sick', 'personal', 'unpaid', 'bereavement', 'other'], {
+      message: 'Please select a leave type',
+    }),
     start_date: z.string().min(1, 'Start date is required'),
     end_date: z.string().min(1, 'End date is required'),
     reason: z

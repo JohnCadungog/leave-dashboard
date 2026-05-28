@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useProfile } from '@/hooks/useProfile'
 import { useCreateLeaveRequest } from '@/hooks/useLeaveRequests'
 import { leaveRequestSchema, type LeaveRequestValues } from '@/lib/schemas/leaveRequest'
+import { LEAVE_TYPES } from '@/lib/supabase/types'
 import { mapSupabaseError } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -34,7 +35,7 @@ function NewRequestContent() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { data: profile } = useProfile(user?.id)
-  const createRequest = useCreateLeaveRequest(profile)
+  const createRequest = useCreateLeaveRequest(profile, user?.email)
 
   const [startOpen, setStartOpen] = useState(false)
   const [endOpen, setEndOpen] = useState(false)
@@ -46,7 +47,12 @@ function NewRequestContent() {
     formState: { errors, isSubmitting },
   } = useForm<LeaveRequestValues>({
     resolver: zodResolver(leaveRequestSchema),
-    defaultValues: { start_date: '', end_date: '', reason: '' },
+    defaultValues: {
+      leave_type: 'annual',
+      start_date: '',
+      end_date: '',
+      reason: '',
+    },
   })
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -58,6 +64,7 @@ function NewRequestContent() {
     try {
       await createRequest.mutateAsync({
         employee_id: user.id,
+        leave_type: values.leave_type,
         start_date: values.start_date,
         end_date: values.end_date,
         reason: values.reason,
@@ -83,6 +90,35 @@ function NewRequestContent() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+            {/* Leave type */}
+            <div className="space-y-1.5">
+              <Label htmlFor="leave-type">Leave type</Label>
+              <Controller
+                name="leave_type"
+                control={control}
+                render={({ field }) => (
+                  <select
+                    id="leave-type"
+                    {...field}
+                    aria-describedby={errors.leave_type ? 'leave-type-error' : undefined}
+                    aria-invalid={!!errors.leave_type}
+                    className="flex h-9 w-full items-center justify-between rounded-lg border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {LEAVE_TYPES.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              />
+              {errors.leave_type && (
+                <p id="leave-type-error" role="alert" className="text-xs text-destructive">
+                  {errors.leave_type.message}
+                </p>
+              )}
+            </div>
+
             {/* Start date */}
             <div className="space-y-1.5">
               <Label htmlFor="start-date-btn">Start date</Label>

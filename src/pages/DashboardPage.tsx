@@ -6,6 +6,7 @@ import { CheckCircle2, PlusCircle, XCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfile } from '@/hooks/useProfile'
 import { useLeaveRequests, useDecideLeaveRequest } from '@/hooks/useLeaveRequests'
+import { leaveTypeLabel } from '@/lib/supabase/types'
 import type { LeaveRequestStatus, LeaveRequestWithEmployee } from '@/lib/supabase/types'
 import { formatDate, formatRelative, countDays, mapSupabaseError } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -49,11 +50,13 @@ function DashboardContent() {
   const { data: profile } = useProfile(user?.id)
   const isManager = profile?.role === 'manager'
 
+  // Employees see only their own requests; managers see all.
+  const employeeFilter = isManager ? undefined : user?.id
   const {
     data: requests,
     isLoading,
     error,
-  } = useLeaveRequests(filter === 'all' ? undefined : filter)
+  } = useLeaveRequests(filter === 'all' ? undefined : filter, employeeFilter)
   const decideRequest = useDecideLeaveRequest(profile)
 
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -90,7 +93,9 @@ function DashboardContent() {
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Leave Requests</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">All requests across the team</p>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {isManager ? 'All requests across the team' : 'Your leave requests'}
+          </p>
         </div>
         <Button asChild size="sm">
           <Link to="/new-request">
@@ -137,6 +142,12 @@ function DashboardContent() {
                   className="px-4 py-3 text-left font-semibold text-zinc-600 dark:text-zinc-400"
                 >
                   Employee
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left font-semibold text-zinc-600 dark:text-zinc-400"
+                >
+                  Type
                 </th>
                 <th
                   scope="col"
@@ -191,6 +202,9 @@ function DashboardContent() {
                   className="bg-background hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 transition-colors"
                 >
                   <td className="px-4 py-3 font-medium">{r.employee.full_name}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-zinc-600 dark:text-zinc-400">
+                    {leaveTypeLabel(r.leave_type)}
+                  </td>
                   <td className="px-4 py-3 whitespace-nowrap text-zinc-600 dark:text-zinc-400">
                     {formatDate(r.start_date)}
                     {r.start_date !== r.end_date && <> – {formatDate(r.end_date)}</>}
@@ -300,16 +314,16 @@ function SkeletonTable() {
       aria-label="Loading requests"
     >
       <div className="bg-zinc-50 dark:bg-zinc-900 px-4 py-3">
-        <div className="grid grid-cols-7 gap-4">
-          {Array.from({ length: 7 }, (_, i) => (
+        <div className="grid grid-cols-8 gap-4">
+          {Array.from({ length: 8 }, (_, i) => (
             <Skeleton key={i} className="h-4 w-full" />
           ))}
         </div>
       </div>
       {Array.from({ length: 5 }, (_, i) => (
         <div key={i} className="border-t border-zinc-100 dark:border-zinc-800 px-4 py-3">
-          <div className="grid grid-cols-7 gap-4">
-            {Array.from({ length: 7 }, (_, j) => (
+          <div className="grid grid-cols-8 gap-4">
+            {Array.from({ length: 8 }, (_, j) => (
               <Skeleton key={j} className="h-4 w-full" />
             ))}
           </div>
