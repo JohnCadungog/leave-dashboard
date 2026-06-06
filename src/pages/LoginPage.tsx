@@ -24,11 +24,14 @@ export function LoginPage() {
   const navigate = useNavigate()
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-50 to-white px-4 dark:from-zinc-950 dark:to-zinc-900">
-      <div className="w-full max-w-md">
+    <div className="app-background flex min-h-screen items-center justify-center px-4 py-10">
+      <div
+        className="content-stagger w-full"
+        style={{ maxWidth: 'min(28rem, calc(100vw - 2rem))' }}
+      >
         <div className="mb-8 text-center">
           <div className="flex justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-sm">
+            <div className="interactive-lift flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-lg shadow-indigo-600/25">
               <CalendarDays className="h-6 w-6" aria-hidden="true" />
             </div>
           </div>
@@ -38,7 +41,7 @@ export function LoginPage() {
 
         <Card>
           <CardHeader className="pb-4">
-            <div role="tablist" className="grid w-full grid-cols-2 rounded-lg bg-muted p-1">
+            <div role="tablist" className="grid w-full grid-cols-2 rounded-lg bg-muted/80 p-1">
               <button
                 role="tab"
                 aria-selected={tab === 'signin'}
@@ -165,7 +168,7 @@ function SignInForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? 'Signing in…' : 'Sign in'}
+        {isSubmitting ? 'Signing in...' : 'Sign in'}
       </Button>
     </form>
   )
@@ -278,7 +281,7 @@ function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? 'Creating account…' : 'Create account'}
+        {isSubmitting ? 'Creating account...' : 'Create account'}
       </Button>
     </form>
   )

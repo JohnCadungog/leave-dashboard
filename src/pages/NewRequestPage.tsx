@@ -77,7 +77,7 @@ function NewRequestContent() {
   }
 
   return (
-    <div className="mx-auto max-w-xl">
+    <div className="content-stagger mx-auto max-w-xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight">New Leave Request</h1>
         <p className="text-sm text-muted-foreground mt-0.5">Submit a leave request for review</p>
@@ -102,7 +102,7 @@ function NewRequestContent() {
                     {...field}
                     aria-describedby={errors.leave_type ? 'leave-type-error' : undefined}
                     aria-invalid={!!errors.leave_type}
-                    className="flex h-9 w-full items-center justify-between rounded-lg border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-9 w-full items-center justify-between rounded-lg border border-input bg-card/70 px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-950/40"
                   >
                     {LEAVE_TYPES.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -133,7 +133,7 @@ function NewRequestContent() {
                         type="button"
                         aria-describedby={errors.start_date ? 'start-date-error' : undefined}
                         data-invalid={errors.start_date ? 'true' : undefined}
-                        className="flex h-9 w-full items-center justify-between rounded-lg border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="interactive-lift flex h-9 w-full items-center justify-between rounded-lg border border-input bg-card/70 px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-950/40"
                       >
                         <span className={field.value ? 'text-foreground' : 'text-muted-foreground'}>
                           {field.value
@@ -181,7 +181,7 @@ function NewRequestContent() {
                         type="button"
                         aria-describedby={errors.end_date ? 'end-date-error' : undefined}
                         data-invalid={errors.end_date ? 'true' : undefined}
-                        className="flex h-9 w-full items-center justify-between rounded-lg border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="interactive-lift flex h-9 w-full items-center justify-between rounded-lg border border-input bg-card/70 px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-950/40"
                       >
                         <span className={field.value ? 'text-foreground' : 'text-muted-foreground'}>
                           {field.value
@@ -226,7 +226,7 @@ function NewRequestContent() {
                 render={({ field }) => (
                   <Textarea
                     id="reason"
-                    placeholder="Briefly describe the reason for your leave…"
+                    placeholder="Briefly describe the reason for your leave..."
                     rows={4}
                     aria-describedby={errors.reason ? 'reason-error' : 'reason-count'}
                     aria-invalid={!!errors.reason}
@@ -268,7 +268,7 @@ function NewRequestContent() {
                 className="flex-1"
                 disabled={isSubmitting || createRequest.isPending}
               >
-                {isSubmitting || createRequest.isPending ? 'Submitting…' : 'Submit request'}
+                {isSubmitting || createRequest.isPending ? 'Submitting...' : 'Submit request'}
               </Button>
             </div>
           </form>

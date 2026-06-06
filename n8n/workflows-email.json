@@ -1,7 +1,7 @@
 {
   "meta": {
-    "instanceId": "leave-dashboard-n8n",
-    "description": "LeaveDesk app -> n8n webhook -> validate secret -> Microsoft Teams channel webhook. Replace PASTE_WEBHOOK_SECRET_HERE and PASTE_TEAMS_CHANNEL_WEBHOOK_URL_HERE inside n8n after import."
+    "instanceId": "leave-dashboard-n8n-email",
+    "description": "LeaveDesk app -> n8n webhook -> validate secret -> send email notifications through Gmail/SMTP. Replace PASTE_WEBHOOK_SECRET_HERE, MANAGER_EMAIL_HERE, and configure the Send Email nodes with your SMTP/Gmail credential after import."
   },
   "nodes": [
     {
@@ -59,26 +59,18 @@
       }
     },
     {
-      "id": "teams-new",
-      "name": "Teams Channel - Notify Manager",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4,
+      "id": "email-new",
+      "name": "Email - Notify Manager",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
       "position": [680, 200],
       "parameters": {
-        "method": "POST",
-        "url": "PASTE_TEAMS_CHANNEL_WEBHOOK_URL_HERE",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"type\": \"message\",\n  \"attachments\": [\n    {\n      \"contentType\": \"application/vnd.microsoft.card.adaptive\",\n      \"contentUrl\": null,\n      \"content\": {\n        \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n        \"type\": \"AdaptiveCard\",\n        \"version\": \"1.2\",\n        \"body\": [\n          {\n            \"type\": \"TextBlock\",\n            \"text\": \"New leave request submitted\",\n            \"weight\": \"Bolder\",\n            \"size\": \"Medium\",\n            \"wrap\": true\n          },\n          {\n            \"type\": \"FactSet\",\n            \"facts\": [\n              { \"title\": \"Employee\", \"value\": \"{{ $json.body.employee_name }}\" },\n              { \"title\": \"Email\", \"value\": \"{{ $json.body.employee_email }}\" },\n              { \"title\": \"Leave type\", \"value\": \"{{ $json.body.leave_type }}\" },\n              { \"title\": \"Dates\", \"value\": \"{{ $json.body.start_date }} to {{ $json.body.end_date }}\" },\n              { \"title\": \"Reason\", \"value\": \"{{ $json.body.reason }}\" }\n            ]\n          },\n          {\n            \"type\": \"TextBlock\",\n            \"text\": \"Open the LeaveDesk dashboard to review this request.\",\n            \"wrap\": true,\n            \"spacing\": \"Medium\"\n          }\n        ]\n      }\n    }\n  ]\n}"
+        "fromEmail": "PASTE_YOUR_GMAIL_ADDRESS_HERE",
+        "toEmail": "MANAGER_EMAIL_HERE",
+        "subject": "=New leave request from {{ $json.body.employee_name }}",
+        "emailFormat": "html",
+        "html": "=<h2>New leave request submitted</h2>\n<p>A new leave request needs manager review.</p>\n<table>\n  <tr><td><strong>Employee</strong></td><td>{{ $json.body.employee_name }}</td></tr>\n  <tr><td><strong>Email</strong></td><td>{{ $json.body.employee_email }}</td></tr>\n  <tr><td><strong>Leave type</strong></td><td>{{ $json.body.leave_type }}</td></tr>\n  <tr><td><strong>Dates</strong></td><td>{{ $json.body.start_date }} to {{ $json.body.end_date }}</td></tr>\n  <tr><td><strong>Reason</strong></td><td>{{ $json.body.reason }}</td></tr>\n</table>\n<p>Open LeaveDesk to approve or reject this request.</p>",
+        "options": {}
       }
     },
     {
@@ -150,26 +142,18 @@
       }
     },
     {
-      "id": "teams-decision",
-      "name": "Teams Channel - Notify Employee Decision",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4,
+      "id": "email-decision",
+      "name": "Email - Notify Employee Decision",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
       "position": [680, 700],
       "parameters": {
-        "method": "POST",
-        "url": "PASTE_TEAMS_CHANNEL_WEBHOOK_URL_HERE",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"type\": \"message\",\n  \"attachments\": [\n    {\n      \"contentType\": \"application/vnd.microsoft.card.adaptive\",\n      \"contentUrl\": null,\n      \"content\": {\n        \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n        \"type\": \"AdaptiveCard\",\n        \"version\": \"1.2\",\n        \"body\": [\n          {\n            \"type\": \"TextBlock\",\n            \"text\": \"Leave request decision\",\n            \"weight\": \"Bolder\",\n            \"size\": \"Medium\",\n            \"wrap\": true\n          },\n          {\n            \"type\": \"FactSet\",\n            \"facts\": [\n              { \"title\": \"Employee\", \"value\": \"{{ $json.body.employee_name }}\" },\n              { \"title\": \"Email\", \"value\": \"{{ $json.body.employee_email }}\" },\n              { \"title\": \"Leave type\", \"value\": \"{{ $json.body.leave_type }}\" },\n              { \"title\": \"Dates\", \"value\": \"{{ $json.body.start_date }} to {{ $json.body.end_date }}\" },\n              { \"title\": \"Decision\", \"value\": \"{{ $json.body.status }}\" },\n              { \"title\": \"Decided by\", \"value\": \"{{ $json.body.decided_by }}\" }\n            ]\n          },\n          {\n            \"type\": \"TextBlock\",\n            \"text\": \"The employee can check LeaveDesk for the updated request status.\",\n            \"wrap\": true,\n            \"spacing\": \"Medium\"\n          }\n        ]\n      }\n    }\n  ]\n}"
+        "fromEmail": "PASTE_YOUR_GMAIL_ADDRESS_HERE",
+        "toEmail": "={{ $json.body.employee_email }}",
+        "subject": "=Your leave request was {{ $json.body.status }}",
+        "emailFormat": "html",
+        "html": "=<h2>Leave request decision</h2>\n<p>Hello {{ $json.body.employee_name }},</p>\n<p>Your leave request has been <strong>{{ $json.body.status }}</strong>.</p>\n<table>\n  <tr><td><strong>Leave type</strong></td><td>{{ $json.body.leave_type }}</td></tr>\n  <tr><td><strong>Dates</strong></td><td>{{ $json.body.start_date }} to {{ $json.body.end_date }}</td></tr>\n  <tr><td><strong>Decided by</strong></td><td>{{ $json.body.decided_by }}</td></tr>\n</table>\n<p>You can open LeaveDesk to view the updated request status.</p>",
+        "options": {}
       }
     },
     {
@@ -203,7 +187,7 @@
       "main": [
         [
           {
-            "node": "Teams Channel - Notify Manager",
+            "node": "Email - Notify Manager",
             "type": "main",
             "index": 0
           }
@@ -217,7 +201,7 @@
         ]
       ]
     },
-    "Teams Channel - Notify Manager": {
+    "Email - Notify Manager": {
       "main": [
         [
           {
@@ -243,7 +227,7 @@
       "main": [
         [
           {
-            "node": "Teams Channel - Notify Employee Decision",
+            "node": "Email - Notify Employee Decision",
             "type": "main",
             "index": 0
           }
@@ -257,7 +241,7 @@
         ]
       ]
     },
-    "Teams Channel - Notify Employee Decision": {
+    "Email - Notify Employee Decision": {
       "main": [
         [
           {

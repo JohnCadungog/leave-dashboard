@@ -42,7 +42,7 @@ function CalendarContent() {
   const events = useMemo<CalendarEvent[]>(() => {
     if (!requests) return []
     return requests.map((r) => ({
-      title: `${r.employee.full_name} · ${leaveTypeLabel(r.leave_type)}`,
+      title: `${r.employee.full_name} - ${leaveTypeLabel(r.leave_type)}`,
       start: parseISO(r.start_date),
       end: parseISO(r.end_date),
       allDay: true,
@@ -94,7 +94,7 @@ function CalendarContent() {
   }
 
   return (
-    <div>
+    <div className="content-stagger">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Leave Calendar</h1>
@@ -165,7 +165,7 @@ function EventDetailModal({
             <p className="text-sm text-muted-foreground">
               {formatDate(event.resource.start_date)}
               {event.resource.start_date !== event.resource.end_date &&
-                ` – ${formatDate(event.resource.end_date)}`}
+                ` - ${formatDate(event.resource.end_date)}`}
             </p>
             <p className="text-sm">{event.resource.reason}</p>
           </div>

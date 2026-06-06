@@ -38,7 +38,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
     </div>
   `
 } else {
-  // Env vars present — dynamically import App so the Supabase client
+  // Env vars present - dynamically import App so the Supabase client
   // is only instantiated after we've confirmed the vars exist.
   import('./App.tsx').then(({ default: App }) => {
     createRoot(rootEl).render(

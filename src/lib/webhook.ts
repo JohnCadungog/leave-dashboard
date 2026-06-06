@@ -42,7 +42,7 @@ export function notifyNewRequest(payload: NewRequestPayload): void {
   const url = import.meta.env.VITE_N8N_NEW_REQUEST_WEBHOOK as string
   if (!url) return
   postWebhook(url, payload).catch(() => {
-    toast.warning('Request saved, but Teams notification could not be sent.')
+    toast.warning('Request saved, but notification could not be sent.')
   })
 }
 
@@ -50,6 +50,6 @@ export function notifyDecision(payload: DecisionPayload): void {
   const url = import.meta.env.VITE_N8N_DECISION_WEBHOOK as string
   if (!url) return
   postWebhook(url, payload).catch(() => {
-    toast.warning('Decision saved, but Teams notification could not be sent.')
+    toast.warning('Decision saved, but notification could not be sent.')
   })
 }

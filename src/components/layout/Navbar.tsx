@@ -48,7 +48,7 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:border-zinc-800">
+    <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-background/78 shadow-sm shadow-zinc-950/[0.03] backdrop-blur-xl supports-[backdrop-filter]:bg-background/62 dark:border-zinc-800/80 dark:shadow-black/20">
       <nav
         className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
         aria-label="Main navigation"
@@ -56,7 +56,7 @@ export function Navbar() {
         {/* Logo */}
         <Link
           to="/dashboard"
-          className="flex items-center gap-2 font-semibold text-indigo-600 hover:text-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
+          className="interactive-lift flex items-center gap-2 rounded-md font-semibold text-indigo-600 hover:text-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:text-indigo-400 dark:hover:text-indigo-300"
         >
           <CalendarDays className="h-5 w-5" aria-hidden="true" />
           <span className="hidden sm:inline">LeaveDesk</span>
@@ -70,10 +70,10 @@ export function Navbar() {
               to={to}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  'interactive-lift flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   isActive
-                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
-                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100'
+                    ? 'bg-indigo-50/90 text-indigo-700 shadow-sm shadow-indigo-950/5 dark:bg-indigo-950/80 dark:text-indigo-300'
+                    : 'text-zinc-600 hover:bg-zinc-100/80 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/80 dark:hover:text-zinc-100'
                 )
               }
             >
@@ -154,8 +154,8 @@ export function Navbar() {
                 cn(
                   'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                   isActive
-                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
-                    : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800'
+                    ? 'bg-indigo-50/90 text-indigo-700 dark:bg-indigo-950/80 dark:text-indigo-300'
+                    : 'text-zinc-600 hover:bg-zinc-100/80 dark:text-zinc-400 dark:hover:bg-zinc-800/80'
                 )
               }
             >

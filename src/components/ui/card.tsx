@@ -2,13 +2,7 @@ import { cn } from '@/lib/utils'
 
 function Card({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   return (
-    <div
-      className={cn(
-        'rounded-lg border border-zinc-200 bg-card text-card-foreground shadow-sm dark:border-zinc-800',
-        className
-      )}
-      {...props}
-    />
+    <div className={cn('surface-panel rounded-lg text-card-foreground', className)} {...props} />
   )
 }
 

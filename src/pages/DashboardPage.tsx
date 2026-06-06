@@ -89,7 +89,7 @@ function DashboardContent() {
   }
 
   return (
-    <div>
+    <div className="content-stagger">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Leave Requests</h1>
@@ -112,10 +112,10 @@ function DashboardContent() {
             key={value}
             onClick={() => setFilter(value)}
             aria-pressed={filter === value}
-            className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            className={`interactive-lift rounded-full border px-3 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
               filter === value
-                ? 'border-indigo-300 bg-indigo-50 text-indigo-700 dark:border-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
-                : 'border-zinc-200 bg-background text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800'
+                ? 'border-indigo-300 bg-indigo-50/90 text-indigo-700 shadow-sm shadow-indigo-950/5 dark:border-indigo-700 dark:bg-indigo-950/80 dark:text-indigo-300'
+                : 'border-zinc-200/80 bg-card/75 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950/50 dark:text-zinc-400 dark:hover:bg-zinc-800/80'
             }`}
           >
             {label}
@@ -133,10 +133,10 @@ function DashboardContent() {
       ) : !requests?.length ? (
         <EmptyState />
       ) : (
-        <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-x-auto">
+        <div className="surface-panel overflow-x-auto rounded-lg">
           <table className="w-full text-sm" aria-label="Leave requests">
             <thead>
-              <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
+              <tr className="border-b border-zinc-200/80 bg-zinc-50/80 dark:border-zinc-800/80 dark:bg-zinc-900/60">
                 <th
                   scope="col"
                   className="px-4 py-3 text-left font-semibold text-zinc-600 dark:text-zinc-400"
@@ -199,7 +199,7 @@ function DashboardContent() {
               {requests.map((r) => (
                 <tr
                   key={r.id}
-                  className="bg-background hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 transition-colors"
+                  className="bg-card/50 transition-colors hover:bg-zinc-50/70 dark:bg-zinc-950/35 dark:hover:bg-zinc-900/70"
                 >
                   <td className="px-4 py-3 font-medium">{r.employee.full_name}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-zinc-600 dark:text-zinc-400">
@@ -207,7 +207,7 @@ function DashboardContent() {
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-zinc-600 dark:text-zinc-400">
                     {formatDate(r.start_date)}
-                    {r.start_date !== r.end_date && <> – {formatDate(r.end_date)}</>}
+                    {r.start_date !== r.end_date && <> - {formatDate(r.end_date)}</>}
                   </td>
                   <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
                     {countDays(r.start_date, r.end_date)}
@@ -224,7 +224,7 @@ function DashboardContent() {
                     <StatusBadge status={r.status} />
                   </td>
                   <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-                    {r.decider?.full_name ?? '—'}
+                    {r.decider?.full_name ?? '-'}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-zinc-500 dark:text-zinc-500 text-xs">
                     {formatRelative(r.created_at)}
@@ -294,7 +294,7 @@ function DashboardContent() {
               disabled={decideRequest.isPending}
             >
               {decideRequest.isPending
-                ? 'Saving…'
+                ? 'Saving...'
                 : confirmDialog?.action === 'approved'
                   ? 'Yes, approve'
                   : 'Yes, reject'}
@@ -309,11 +309,11 @@ function DashboardContent() {
 function SkeletonTable() {
   return (
     <div
-      className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+      className="surface-panel overflow-hidden rounded-lg"
       aria-busy="true"
       aria-label="Loading requests"
     >
-      <div className="bg-zinc-50 dark:bg-zinc-900 px-4 py-3">
+      <div className="bg-zinc-50/80 px-4 py-3 dark:bg-zinc-900/60">
         <div className="grid grid-cols-8 gap-4">
           {Array.from({ length: 8 }, (_, i) => (
             <Skeleton key={i} className="h-4 w-full" />
@@ -321,7 +321,7 @@ function SkeletonTable() {
         </div>
       </div>
       {Array.from({ length: 5 }, (_, i) => (
-        <div key={i} className="border-t border-zinc-100 dark:border-zinc-800 px-4 py-3">
+        <div key={i} className="border-t border-zinc-100/80 px-4 py-3 dark:border-zinc-800/80">
           <div className="grid grid-cols-8 gap-4">
             {Array.from({ length: 8 }, (_, j) => (
               <Skeleton key={j} className="h-4 w-full" />
@@ -335,8 +335,8 @@ function SkeletonTable() {
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 py-20 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
+    <div className="surface-panel flex flex-col items-center justify-center gap-4 rounded-lg border-dashed py-20 text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-100/90 dark:bg-zinc-800/90">
         <CalendarDaysIcon />
       </div>
       <div>
